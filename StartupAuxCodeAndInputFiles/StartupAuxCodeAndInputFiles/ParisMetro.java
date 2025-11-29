@@ -15,7 +15,6 @@
 //
 
 import java.util.*;
-import java.io.*;
 
 public class ParisMetro {
 
@@ -55,13 +54,13 @@ public class ParisMetro {
 
         /*
          * Adjacency list for the directed metroGraph.
-         * Each entry metroAdjacencyList[u] stores the outgoing MetroEdge objects
+         * Each entry metroGraph[u] stores the outgoing MetroEdge objects
          * from vertex u with positive travel time.
          */
         @SuppressWarnings("unchecked")
-        ArrayList<MetroEdge>[] metroAdjacencyList = new ArrayList[numVertices];
+        ArrayList<MetroEdge>[] metroGraph = new ArrayList[numVertices];
         for (int vertexIndex = 0; vertexIndex < numVertices; vertexIndex++) {
-            metroAdjacencyList[vertexIndex] = new ArrayList<MetroEdge>();
+            metroGraph[vertexIndex] = new ArrayList<MetroEdge>();
         }
 
         /*
@@ -135,7 +134,7 @@ public class ParisMetro {
             if (weight == -1) {
                 hubPartition.union(vertexNodes[sourceIndex], vertexNodes[destinationIndex]);
             } else if (weight > 0) {
-                metroAdjacencyList[sourceIndex].add(new MetroEdge(destinationIndex, weight));
+                metroGraph[sourceIndex].add(new MetroEdge(destinationIndex, weight));
             }
         }
 
@@ -254,7 +253,7 @@ public class ParisMetro {
                     continue;
                 }
 
-                for (MetroEdge outgoingEdge : metroAdjacencyList[currentVertex]) {
+                for (MetroEdge outgoingEdge : metroGraph[currentVertex]) {
                     if (outgoingEdge.weight <= 0) {
                         continue;
                     }
@@ -293,7 +292,7 @@ public class ParisMetro {
          *
          * Each segment is stored as a small int[] of the form {i, j, weight}.
          */
-        ArrayList<int[]> hubSegments = new ArrayList<int[]>();
+        ArrayList<int[]> expensiveParisSubway = new ArrayList<int[]>();
         for (int hubIndex1 = 0; hubIndex1 < numberOfHubs; hubIndex1++) {
             for (int hubIndex2 = hubIndex1 + 1; hubIndex2 < numberOfHubs; hubIndex2++) {
                 int costForward = bestSegmentCost[hubIndex1][hubIndex2];
@@ -301,19 +300,19 @@ public class ParisMetro {
                 int segmentCost = Math.min(costForward, costBackward);
 
                 if (segmentCost < INF) {
-                    hubSegments.add(new int[] { hubIndex1, hubIndex2, segmentCost });
+                    expensiveParisSubway.add(new int[] { hubIndex1, hubIndex2, segmentCost });
                 }
             }
         }
 
-        System.out.println("Number of Possible Segments = " + hubSegments.size());
+        System.out.println("Number of Possible Segments = " + expensiveParisSubway.size());
 
         /*
          * Phase 5: Run Kruskal's algorithm on expensiveParisSubway using
          * the Partition ADT from Part A.
          */
 
-        int numberOfSegments = hubSegments.size();
+        int numberOfSegments = expensiveParisSubway.size();
         if (numberOfHubs == 0 || numberOfSegments == 0) {
             System.out.println("Impossible");
             return;
@@ -337,7 +336,7 @@ public class ParisMetro {
         @SuppressWarnings("unchecked")
         Edge<String>[] mstEdgeArray = new Edge[numberOfSegments];
         for (int segmentIndex = 0; segmentIndex < numberOfSegments; segmentIndex++) {
-            int[] segment = hubSegments.get(segmentIndex);
+            int[] segment = expensiveParisSubway.get(segmentIndex);
             int hubIndex1 = segment[0];
             int hubIndex2 = segment[1];
             int segmentCost = segment[2];
